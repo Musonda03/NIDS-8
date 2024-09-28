@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Visualization</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Traffic Visualization</h1>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+        <p>This chart shows the packet count over time, helping to monitor network traffic and detect anomalies like SYN floods.</p>
+        <canvas id="trafficChart" width="800" height="400"></canvas>
+        <button class="action-btn" onclick="navigateToDashboard()">Back to Dashboard</button>
+    </div>
+    <script src="{{ url_for('static', filename='js/traffic.js') }}"></script>
+    <script>
+        function logout() {
+            window.location.href = '/logout';
+        }
+    function navigateToDashboard() {
+        window.location.href = '/';
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Traffic Chart</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Network Traffic Over Time</h1>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+        <div>
+            {{ graph_html|safe }}
+        </div>
+        <button class="action-btn" onclick="navigateToDashboard()">Back to Dashboard</button>
+    </div>
+    <script>
+        function logout() {
+            window.location.href = '/logout';
+        }
+        
+        function navigateToDashboard() {
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>

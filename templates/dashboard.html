@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background-color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .header .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .header .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #ffffff;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border-radius: 5px;
+        }
+        .header .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        .header .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        .header .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .header .dropdown-btn,
+        .header .logout-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+        .header .dropdown-btn {
+            margin-right: 10px;
+        }
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .anomalies-section {
+            width: 100%;
+            margin-bottom: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .anomalies-section h2 {
+            margin: 0 0 10px;
+        }
+        .anomalies-container {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            height: 400px;
+            overflow-y: auto;
+        }
+        .action-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 100%;
+        }
+        .status-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .status-section p {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>Network Intrusion Detection System Dashboard</h1>
+            <div>
+                <div class="dropdown">
+                    <button class="dropdown-btn">Menu</button>
+                    <div class="dropdown-content">
+                        <a href="#" onclick="navigateToTraffic()">Traffic Visualization</a>
+                        <a href="#" onclick="navigateToPlotlyChart()">Plotly Chart</a>
+                        <a href="#" onclick="viewAnomalies()">Detected Anomalies</a>
+                        <a href="#" onclick="navigateToCapturedData()">Captured Data</a>
+                        <a href="#" onclick="generateAnomalousTraffic()">Generate Anomalous Traffic</a>
+                        <a href="#" onclick="navigateToUserGuide()">User Guide</a>
+                        <a href="#" onclick="updateModel()">Update Model</a> <!-- New option -->
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+        <div class="content">
+            <div class="anomalies-section">
+                <h2>Anomalies Detected by the System (<span id="anomaly-count">0</span>)</h2>
+                <div id="anomalies-container" class="anomalies-container"></div>
+            </div>
+            <div class="status-section">
+                <p id="capture-status">Status: Not Capturing</p>
+                <button class="action-btn" onclick="startCapture()">Start Capture</button>
+                <button class="action-btn" onclick="stopCapture()">Stop Capture</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function logout() {
+            window.location.href = '/logout';
+        }
+
+        function navigateToTraffic() {
+            window.location.href = '/traffic';
+        }
+
+        function navigateToPlotlyChart() {
+            window.location.href = '/plotly_chart';
+        }
+
+        function navigateToUserGuide() {
+            window.location.href = '/user_guide';
+        }
+
+        function fetchAnomalies() {
+            fetch('/anomalies')
+                .then(response => response.json())
+                .then(data => {
+                    const anomaliesContainer = document.getElementById('anomalies-container');
+                    const anomalyCount = document.getElementById('anomaly-count');
+                    anomaliesContainer.innerHTML = '';
+                    anomalyCount.textContent = data.length;
+                    data.forEach(anomaly => {
+                        const anomalyCard = document.createElement('div');
+                        anomalyCard.className = 'anomaly-card';
+                        anomalyCard.innerHTML = `
+                            <div class="anomaly-header">
+                                <span class="anomaly-timestamp">${new Date(anomaly.timestamp * 1000).toLocaleString()}</span>
+                            </div>
+                            <div class="anomaly-body">
+                                <p><strong>Source IP:</strong> ${anomaly.ip_src}</p>
+                                <p><strong>Destination IP:</strong> ${anomaly.ip_dst}</p>
+                                <p><strong>Protocol:</strong> ${anomaly.ip_proto}</p>
+                                <p><strong>Source Port:</strong> ${anomaly.sport}</p>
+                                <p><strong>Destination Port:</strong> ${anomaly.dport}</p>
+                                <p><strong>TCP Flags:</strong> ${anomaly.tcp_flags}</p>
+                            </div>
+                        `;
+                        anomaliesContainer.appendChild(anomalyCard);
+                    });
+                });
+        }
+
+        setInterval(fetchAnomalies, 5000);
+
+        function startCapture() {
+            fetch('/start_capture', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('capture-status').textContent = 'Capturing';
+                    console.log(data);
+                });
+        }
+
+        function stopCapture() {
+            fetch('/stop_capture', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('capture-status').textContent = 'Not Capturing';
+                    console.log(data);
+                });
+        }
+
+        function viewAnomalies() {
+            window.location.href = '/view_anomalies';
+        }
+
+        function navigateToCapturedData() {
+            window.location.href = '/captured_data';
+        }
+
+        function updateModel() {
+            fetch('/update_model', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => alert(data.message));
+        }
+
+        function generateAnomalousTraffic() {
+            fetch('/generate_anomalous_traffic')
+                .then(response => response.json())
+                .then(data => console.log(data));
+        }
+
+        // Initialize the anomalies fetching
+        fetchAnomalies();
+    </script>
+</body>
+</html>
+

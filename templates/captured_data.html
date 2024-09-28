@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captured Data</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .packet-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .packet-item {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        .packet-item p {
+            margin: 5px 0;
+        }
+        .action-btn {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Captured Data</h1>
+        <ul id="packet-list" class="packet-list"></ul>
+        <a href="/" class="action-btn">Back to Dashboard</a>
+    </div>
+    <script>
+        function fetchCapturedData() {
+            fetch('/captured_data')
+                .then(response => response.json())
+                .then(data => {
+                    const packetList = document.getElementById('packet-list');
+                    packetList.innerHTML = ''; // Clear existing list items
+
+                    data.forEach(packet => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'packet-item';
+                        listItem.innerHTML = `
+                            <p><strong>Timestamp:</strong> ${new Date(packet.timestamp * 1000).toLocaleString()}</p>
+                            <p><strong>Source IP:</strong> ${packet.ip_src}</p>
+                            <p><strong>Destination IP:</strong> ${packet.ip_dst}</p>
+                            <p><strong>Protocol:</strong> ${packet.ip_proto}</p>
+                            <p><strong>Source Port:</strong> ${packet.sport}</p>
+                            <p><strong>Destination Port:</strong> ${packet.dport}</p>
+                            <p><strong>TCP Flags:</strong> ${packet.tcp_flags}</p>
+                            <p><strong>Label:</strong> ${packet.label}</p>
+                        `;
+                        packetList.appendChild(listItem);
+                    });
+                })
+                .catch(error => console.error('Error fetching captured data:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchCapturedData);
+    </script>
+</body>
+</html>
+
+
+

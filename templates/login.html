@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="background-container">
+        <div class="welcome-message">
+            <h1>Welcome to the Network Intrusion Detection System</h1>
+            <button class="show-login-btn" onclick="showLoginBox()">Login</button>
+        </div>
+        <div class="login-container" id="loginBox" style="display:none;">
+            <button class="exit-login-btn" onclick="hideLoginBox()">X</button>
+            <form method="POST" action="/login">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        function showLoginBox() {
+            document.getElementById('loginBox').style.display = 'block';
+            document.querySelector('.welcome-message').style.display = 'none';
+        }
+
+        function hideLoginBox() {
+            document.getElementById('loginBox').style.display = 'none';
+            document.querySelector('.welcome-message').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
